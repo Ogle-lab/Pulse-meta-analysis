@@ -6,45 +6,54 @@ model{
     et.rep[i] ~ dnorm(mu[i], tau)
     
     # Mean model
-    # KO: This model, below, is highly non-linear and could lead to numerical errors or mixing issues.
-    #mu[i] <- a[sID[i]]*t[i]*exp(-b[sID[i]]*t[i])
-    # KO: Here's an alternative that is reparameterized in terms of "meaningful" parameters and first
-    # evaluated on the Log-scale:
-    Lmu[i] <- 1 - t[i]/exp(Lpeakt[sID[i]]) + Lmaxy[sID[i]] + Lpeakt[sID[i]] + Log[t[i]]
-    # KO: exponential to "regular" scale:
-    mu[i] <- exp(Lmu[i])
+    # KO: Here's an alternative that is reparameterized in terms of "meaningful" parameters and first evaluated on the Log-scale:
+    mu[i] <- y.peak[pID[i]]*TimePart[i]
+    TimePart[i] <- exp(LogPart[i])
+    LogPart[i] <- 1-(t[i]/t.peak[pID[i]]) + log(t[i]) - Lt.peak[pID[i]]
     
     # Square differences
     Sqdiff[i] <- pow(et[i] - et.rep[i], 2) 
   }
   
+  for(p in 1:Npulse){ # number of pulses
+    Lt.peak[p] ~ dnorm(mu.Lt.peak[sID[p]], tau.Lt.peak)
+    t.peak[p] <- exp(Lt.peak[p])
+    y.peak[p] ~ dnorm(mu.y.peak[sID[p]], tau.y.peak)
+  }
+  
   # Priors for Ricker model and variance
   for(s in 1:Nstudy){ # number of studies
   # KO: I would model the parameters hierarchically. The reparmeterized model is in terms
-  # of the time (t) at which the response peaks (peakt) and the maximum response value at
-  # the peak (maxy)
-    #a[s] ~ dgamma(0.1, 0.1)
-    #b[s] ~ dgamma(0.1, 0.1)
+  # of the time (t) at which the response peaks (t.peak) and the maximum response value at
+  # the peak (y.peak)
     # KO: Priors on log-scale:
-    Lpeakt[s] ~ dnorm(mu.Lpeakt, tau.Lpeakt)
-    Lmaxy[s] ~ dnorm(mu.Lmaxy, tau.Lmaxy)   
-    # KO: transform to "meaningful" scale:
-    peakt[s] <- exp(Lpeakt[s])
-    maxy[s] <- exp(Lmaxy[s])
+    mu.Lt.peak[s] ~ dnorm(M.Lt.peak, T.Lt.peak)
+    mu.t.peak[s] <- exp(mu.Lt.peak[s])
+    mu.y.peak[s] ~ dnorm(M.y.peak, T.y.peak)
+    
+    
 }
 # KO: priors for population level parameters:
-    mu.Lpeakt ~ dnorm(0,0.00001)
-    mu.Lmaxy ~ dnorm(0,0.00001)
-    mu.peakt <- exp(mu.Lpeakt)
-    mu.maxy <- exp(mu.Lmaxy)
-    sig.Lpeakt ~ dunif(0,100)
-    sig.Lmaxy ~ dunif(0,100)
-    tau.Lpeakt <- pow(sig.Lpeakt,-2)
-    tau.Lmaxy <- pow(sig.Lmaxy,-2)
+    M.Lt.peak ~ dnorm(0,0.0001)
+    M.y.peak ~ dnorm(0,0.0001)
+    M.t.peak <- exp(M.Lt.peak)
     
-  tau ~ dgamma(0.01, 0.01)
+    
+    # pulse level
+    sig.Lt.peak ~ dunif(0,100)
+    sig.y.peak ~ dunif(0,100)
+    tau.Lt.peak <- pow(sig.Lt.peak,-2)
+    tau.y.peak <- pow(sig.y.peak,-2)
+    
+    # study level
+    S.Lt.peak ~ dunif(0,100)
+    S.y.peak ~ dunif(0,100) 
+    T.Lt.peak <- pow(S.Lt.peak, -2)
+    T.y.peak <- pow(S.y.peak, -2)
+    
   
-  # Standard deviation to monitor
+  # Observation level
+  tau ~ dgamma(0.01, 0.01)
   sig <- pow(tau, -0.5)
   
   # Dsum
