@@ -53,15 +53,15 @@ df <- df %>%
   mutate(label = ifelse(value==0, "nonsignificant", label)) %>%
   mutate(value = ifelse(value==0, NA, value))
 
-# Manually add in reference labels for reading ease
+# Manually add in reference labels for reading ease (! remember to update in-between runs !)
 df_temp <- data.frame(coefficient = c("Carbon-related","Carbon-related","Carbon-related","Carbon-related",
                                       "Spatial scale: leaf","Spatial scale: leaf","Spatial scale: leaf","Spatial scale: leaf"),
                       question = c("GLM.for.response.or.no.response","GLM.for.time.of.peak", "GLM.for.magnitude.of.peak", "GLM.for.speed.of.linear.response",
                                    "GLM.for.response.or.no.response","GLM.for.time.of.peak", "GLM.for.magnitude.of.peak", "GLM.for.speed.of.linear.response"),
                       value = c(NA,NA,NA,NA,
                                 NA,NA,NA,NA),
-                      label = c("nonsignificant", "positive", "negative","nonsignificant",
-                                "negative", "positive", "positive","nonsignificant"))
+                      label = c("nonsignificant", "nonsignificant", "positive","nonsignificant",
+                                "nonsignificant", "positive", "positive","nonsignificant"))
 
 df <- rbind(df,df_temp)
 
@@ -163,6 +163,6 @@ p <- df %>%
 p
 
 
-ggsave2("fig5.png", plot = p, path = "./figures/", width = 8, height = 8.7)
+ggsave2("fig5v2.png", plot = p, path = "./figures/", width = 8, height = 8.7)
 
 

@@ -9,6 +9,9 @@ path_out = "./figures/" # set save path
 # Load output data
 load("data_output/df_all.Rdata") # df_all
 
+df_all <- df_all %>%
+  drop_na(sID)
+
 df_all2 <- df_all %>%
   mutate(Sample.unit = ifelse(Sample.unit=="plot/collar", "plot/footprint", Sample.unit)) %>%
   mutate(Sample.unit = ifelse(Sample.unit=="footprint", "plot/footprint", Sample.unit)) %>%

@@ -5,30 +5,27 @@ glm(formula = as.factor(response_cat) ~ varGroup + Sample.unit +
     varGroup + Pulse.amount.mm * varGroup, family = binomial, 
     data = df_all1)
 
-Deviance Residuals: 
-    Min       1Q   Median       3Q      Max  
--1.3317  -0.8537  -0.6567   1.1783   2.2639  
-
 Coefficients:
-                                        Estimate Std. Error z value Pr(>|z|)   
-(Intercept)                           -1.1704272  0.6855801  -1.707  0.08778 . 
-varGroupWater-related                  0.6909999  0.7751246   0.891  0.37268   
-Sample.unitindividual                  1.0976722  0.3442795   3.188  0.00143 **
-Sample.unitplot/footprint              0.6853332  0.2792622   2.454  0.01412 * 
-MAT.C                                 -0.0150665  0.0494583  -0.305  0.76065   
-MAP.mm                                -0.0027505  0.0014364  -1.915  0.05550 . 
-Pulse.amount.mm                        0.0011654  0.0044648   0.261  0.79408   
-MAT.C:MAP.mm                           0.0001357  0.0001150   1.180  0.23820   
-varGroupWater-related:MAP.mm          -0.0008026  0.0016117  -0.498  0.61851   
-varGroupWater-related:Pulse.amount.mm  0.0004855  0.0104404   0.047  0.96291   
+                                        Estimate Std. Error z value Pr(>|z|)  
+(Intercept)                           -0.1600524  0.7381277  -0.217   0.8283  
+varGroupWater-related                  1.2859631  1.0005832   1.285   0.1987  
+Sample.unitindividual                  0.6481944  0.4631158   1.400   0.1616  
+Sample.unitplot/footprint             -0.0580674  0.3259895  -0.178   0.8586  
+MAT.C                                 -0.0744980  0.0540752  -1.378   0.1683  
+MAP.mm                                -0.0026334  0.0014673  -1.795   0.0727 .
+Pulse.amount.mm                        0.0018368  0.0042981   0.427   0.6691  
+MAT.C:MAP.mm                           0.0002084  0.0001242   1.678   0.0934 .
+varGroupWater-related:MAP.mm          -0.0037763  0.0023219  -1.626   0.1039  
+varGroupWater-related:Pulse.amount.mm -0.0306141  0.0178460  -1.715   0.0863 .
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
 (Dispersion parameter for binomial family taken to be 1)
 
-    Null deviance: 687.73  on 586  degrees of freedom
-Residual deviance: 651.15  on 577  degrees of freedom
-AIC: 671.15
+    Null deviance: 504.58  on 465  degrees of freedom
+Residual deviance: 485.78  on 456  degrees of freedom
+  (121 observations deleted due to missingness)
+AIC: 505.78
 
 Number of Fisher Scoring iterations: 4
 

@@ -30,6 +30,14 @@ points <- SpatialPoints(coords, proj4string = r@crs)
 aridity_index_df <- read.csv("./data_raw/aridity_index_df.csv")
 aridity_spat <- rast("./data_raw/aridity_index.tif")
 
+# Make infinite values the max aridity so humid areas won't show up as blanks
+# aridity_index_df2 <- aridity_index_df %>%
+#   mutate(layer = case_when(layer>2 ~ 2,
+#          layer<=2 ~ layer)) %>%
+#   select(-category)
+# aridity_spat2 <- rasterFromXYZ(aridity_index_df2) # convert to rasterbrick
+# aridity_spat2 <- rast(aridity_spat2) # convert to spatraster for plotting
+
 # Make custom color palette
 library(unikn)
 mypal2 = rev(cetcolor::cet_pal(20, name = "r2", alpha = 0.5)) 

@@ -16,9 +16,21 @@ d_clean <- read_csv("./data_clean/Clean_record_info.csv") %>%
 
 str(d_clean)
 
+# check study pulse #
+test <- d_clean %>%
+  group_by(study_pulse) %>%
+  summarize(nvar = length(unique(varType))) %>%
+  filter(nvar == 2) %>%
+  nrow()
+#385
+
 # Important variables
-variables <- c("WUE", "ET", "T", "Gs", "PWP",
-               "ecosystemR", "abovegroundR", "belowgroundR",
+# variables <- c("WUE", "ET", "T", "Gs", "PWP",
+#                "ecosystemR", "abovegroundR", "belowgroundR",
+#                "NPP", "GPP", "Anet") # old
+
+variables <- c("ET", "T", "Gs", "PWP",
+               "ecosystemR", "belowgroundR",
                "NPP", "GPP", "Anet")
 
 # Calculate diagonal
@@ -36,12 +48,20 @@ count_mat1 <- matrix(NA,
 count_mat2 <- matrix(NA, 
                      nrow = length(variables),
                      ncol = length(variables))
+count_mat3 <- matrix(NA, 
+                     nrow = length(variables),
+                     ncol = length(variables))
+count_mat4 <- matrix(NA, 
+                     nrow = length(variables),
+                     ncol = length(variables))
 
 for(i in 1:length(variables)) {
   for(j in 1:length(variables)) {
      if(i == j) { # diagonal
        count_mat1[i, j] <- diag$n_record[i]
        count_mat2[i, j] <- diag$n_pulse[i]
+       count_mat3[i, j] <- diag$n_pulse[i]
+       count_mat4[i, j] <- diag$n_study[i]
      } else if(i > j){ # lower left half
         o_study <- d_clean %>%
          filter(varType == variables[i] | varType == variables[j]) %>%
@@ -59,8 +79,17 @@ for(i in 1:length(variables)) {
         
         count_mat1[i, j] <- o_study
         count_mat2[i, j] <- o_pulse
+        count_mat3[i, j] <- o_study
+        count_mat4[i, j] <- o_study
         
      } else if(j > i) { # upper right half
+       o_pulse2 <- d_clean %>%
+         filter(varType == variables[i] | varType == variables[j]) %>%
+         group_by(study_pulse) %>%
+         summarize(nvar = length(unique(varType))) %>%
+         filter(nvar == 2) %>%
+         nrow()
+       
        o_record <- d_clean %>%
          filter(varType == variables[i] | varType == variables[j]) %>%
          group_by(study_pulse_record) %>%
@@ -70,6 +99,8 @@ for(i in 1:length(variables)) {
        
        count_mat1[i, j] <- o_record
        count_mat2[i, j] <- o_record
+       count_mat3[i, j] <- o_pulse2
+       count_mat4[i, j] <- o_pulse2
      }
   }
 }
@@ -83,6 +114,14 @@ count2_df <- data.frame(count_mat2)
 colnames(count2_df) <- variables
 rownames(count2_df) <- variables
 
+count3_df <- data.frame(count_mat3) 
+colnames(count3_df) <- variables
+rownames(count3_df) <- variables
+
+count4_df <- data.frame(count_mat4) 
+colnames(count4_df) <- variables
+rownames(count4_df) <- variables
+
 # write out
 if(!dir.exists("data_clean/tables")) {
   dir.create("data_clean/tables")
@@ -90,6 +129,10 @@ if(!dir.exists("data_clean/tables")) {
 write.csv(count1_df, file = "data_clean/tables/matrix_study_record.csv")
 
 write.csv(count2_df, file = "data_clean/tables/matrix_pulse_record.csv")
+
+write.csv(count3_df, file = "data_clean/tables/matrix_studyleft_pulseright.csv")
+
+write.csv(count4_df, file = "data_clean/tables/matrix_studyleft_pulseright_studydiag.csv")
 
 
 # Populate matrix of the number of overlapping covariates

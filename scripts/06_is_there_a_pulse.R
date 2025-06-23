@@ -15,9 +15,9 @@ source("./scripts/functions.R")
 # Load cleaned data
 load("models/model_input.Rdata") # out_list
 
-variables <- c("ET", "T", "Gs", "PWP",
-               "ecosystemR","belowgroundR",
-               "NPP", "GPP", "Anet")
+ variables <- c("ET", "T", "Gs", "PWP", # all variables
+                "ecosystemR","belowgroundR",
+                "NPP", "GPP", "Anet")
 
 # Format study and pulse-level data we want in the context of the model output
 pulse_table <- list()
@@ -46,37 +46,148 @@ for( i in 1:length(variables)){
 
 
 
-model_table_longer <- list()
-
+# variables <- c("ET", "T", "Gs", "PWP", # all variables
+#                "ecosystemR","belowgroundR",
+#                "NPP", "GPP", "Anet")
+variables <- c("belowgroundR")
+multigroups <- c("group1", "group2") # group 1 is c("ET", "NPP", "GPP", "ecosystemR") anf group 2 is c("T", "Gs", "PWP", "Anet")
+model_table_longer1 <- list()
 for(i in 1:length(variables)){ # variable loop
   print(paste("i:",i,sep=""))
   var <- variables[i]
     
   # Load jagsUI object
-  #load(paste("models/03-Mixture-simple/coda/jm_coda_fixed_w_", var, ".RData", sep="")) # jagsui temp
-  load(paste("models/03-Mixture-simple/coda/jm_coda_", var, ".RData", sep="")) # jagsui
+  load(paste("models/03-Mixture-simple/coda/jm_coda_fixed_w_", var, ".RData", sep="")) # jagsui
 
     
-  model_table_longer[[i]] <- data.frame(ID = get_index(jagsui), varType = var, # identifiers
+  model_table_longer1[[i]] <- data.frame(ID1 = get_index(jagsui), ID2 = NA, varType = var, # identifiers
                                           param = gsub('[[:digit:]]+', '', names(do.call(c, jagsui$mean))), # parameter names
                                           mean = do.call(c, jagsui$mean), 
                                           pc2.5 = do.call(c, jagsui$q2.5), pc97.5 = do.call(c, jagsui$q97.5),
                                           overlap0 = do.call(c, jagsui$overlap0),
                                           gel = do.call(c, jagsui$Rhat))
 }
-
 ### dataframe of all models and variables connected to site- and pulse-level data, 
 ### dataframe of all models and variables in more of a coda-style format, more convenient for graphing
-df_output_longer <- bind_rows(model_table_longer) # convert list into a dataframe
+df_output_longer1 <- bind_rows(model_table_longer1) # convert list into a dataframe
+
+df_output_longer1 <- df_output_longer1 %>%
+  filter(param %in% c("t.peak","y.peak","bb", "mm","w")) %>%
+  rename(pID = ID1) %>%
+  mutate(converged = ifelse(gel<1.2, "yes", "no"))
+
+# for multivariate model variables
+model_table_longer2 <- list()
+for(i in 1:length(multigroups)){ # variable loop
+  print(paste("i:",i,sep=""))
+  var <- multigroups[i]
+  
+  # Load jagsUI object
+  load(paste("models/03-Mixture-simple/coda/jm_coda_multi_fixed_w_", var, ".RData", sep="")) # jagsui
+  
+  model_table_longer2[[i]] <- dumsum(jagsobj = jagsui, label = var, type = "jagsUI")
+  # model_table_longer2[[i]] <- data.frame(ID = get_index(jagsui), groupType = var, # identifiers
+  #                                       param = gsub('[[:digit:]]+', '', names(do.call(c, jagsui$mean))), # parameter names
+  #                                       mean = do.call(c, jagsui$mean), 
+  #                                       pc2.5 = do.call(c, jagsui$q2.5), pc97.5 = do.call(c, jagsui$q97.5),
+  #                                       overlap0 = do.call(c, jagsui$overlap0),
+  #                                       gel = do.call(c, jagsui$Rhat))
+}
+### dataframe of all models and variables connected to site- and pulse-level data, 
+### dataframe of all models and variables in more of a coda-style format, more convenient for graphing
+df_output_longer2 <- bind_rows(model_table_longer2) # convert list into a dataframe
+
+### Now, convert group and index names into varTypes
+# keys:
+#[p,v]
+df_output_longer2 <- df_output_longer2 %>%
+  filter(param %in% c("t.peak","y.peak","bb", "mm","w")) %>%
+  mutate(pID = ID1, vID = ID2)
+
+df_output_longer2$varType = NA
+for(i in 1:nrow(df_output_longer2)){
+  
+  if(df_output_longer2$group[i]=="group1"){
+    if(df_output_longer2$vID[i]==1){
+      df_output_longer2$varType[i] = "ET"
+    }
+    if(df_output_longer2$vID[i]==2){
+      df_output_longer2$varType[i] = "NPP"
+    }
+    if(df_output_longer2$vID[i]==3){
+      df_output_longer2$varType[i] = "GPP"
+    }
+    if(df_output_longer2$vID[i]==4){
+      df_output_longer2$varType[i] = "ecosystemR"
+    }
+  }
+  
+  if(df_output_longer2$group[i]=="group2"){
+    if(df_output_longer2$vID[i]==1){
+      df_output_longer2$varType[i] = "T"
+    }
+    if(df_output_longer2$vID[i]==2){
+      df_output_longer2$varType[i] = "Gs"
+    }
+    if(df_output_longer2$vID[i]==3){
+      df_output_longer2$varType[i] = "PWP"
+    }
+    if(df_output_longer2$vID[i]==4){
+      df_output_longer2$varType[i] = "Anet"
+    }
+  }
+}
+
+
+# Delete fake combos
+
+# Read in saved keys
+pv_key1 <- readRDS("./models/03-Mixture-simple/df_realIDs_group1.RDS")
+pv_key2 <- readRDS("./models/03-Mixture-simple/df_realIDs_group2.RDS")
+
+# combine p and v IDs to use as key
+df_output_longer2$pvID <- paste(df_output_longer2$pID, df_output_longer2$vID, sep = "")
+pv_key1$pvID <- paste(pv_key1$pID, pv_key1$Var.ID, sep = "")
+pv_key2$pvID <- paste(pv_key2$pID, pv_key2$Var.ID, sep = "")
+
+df_output_longer3 <- df_output_longer2
+
+for(i in 1:nrow(df_output_longer3)){
+  
+  if(df_output_longer3$group[i]=="group1"){
+      
+      if((df_output_longer3$pvID[i] %in% pv_key1$pvID)==F){
+        df_output_longer3[i,] <- NA # Make full row NA if nonexistent
+      }
+    next
+  }
+  
+  if(df_output_longer3$group[i]=="group2"){
+    
+      if((df_output_longer3$pvID[i] %in% pv_key2$pvID)==F){
+        df_output_longer3[i,] <- NA # Make full row NA if nonexistent
+      }
+    next
+  }
+  
+}
+
+# Drop rows based on NA labels
+df_output_longer3 <- df_output_longer3 %>% 
+  drop_na(param)
+
+# Combine all output together
+df_output_longer4 <- full_join(df_output_longer1, df_output_longer3)
+
+
 
 ### df_output_longer pulse-level parameters connected to pulse-level data
 pulse_table2 <- bind_rows(pulse_table)
-df_output_longer2 <- df_output_longer %>%
-  filter(param %in% c("t.peak","y.peak","bb", "mm","w","S","Dsum","Dsump")) %>%
-  rename(pID = ID) %>%
+df_output_longer5 <- df_output_longer4 %>%
+  filter(param %in% c("t.peak","y.peak","bb", "mm","w")) %>%
   mutate(converged = ifelse(gel<1.2, "yes", "no"))
 
-pulse_table2 <- right_join(pulse_table2, df_output_longer2, by=c("pID","varType"))
+pulse_table2 <- right_join(pulse_table2, df_output_longer4, by=c("pID","varType"))
 
 ################## Look at semi-deterministic mixture model
 ################## Here we will also group to look at study/pulse-specific variables

@@ -42,6 +42,8 @@ models/02-Linear-simple/convergence
 models/03-Mixture-simple/coda
 models/03-Mixture-simple/convergence
 models/03-Mixture-simple/convergence_fixed_w
+models/03-Mixture-simple/convergence_multi_fixed_w
+models/03-Mixture-simple/archived
 
 # Suppress old versions and notes to ourselves
 models/test-Ricker/

@@ -4,30 +4,27 @@ glm(formula = mean_mm ~ varGroup + Sample.unit + MAT.C + MAP.mm +
     Pulse.amount.mm + MAP.mm * MAT.C + MAP.mm * varGroup + Pulse.amount.mm * 
     varGroup, data = df_all3)
 
-Deviance Residuals: 
-    Min       1Q   Median       3Q      Max  
- -66457   -16642    -5298     3733  2919281  
-
 Coefficients:
-                                        Estimate Std. Error t value Pr(>|t|)  
-(Intercept)                           -89604.810  57850.603  -1.549   0.1222  
-varGroupWater-related                 -28301.730  64579.961  -0.438   0.6615  
-Sample.unitindividual                  -3741.224  29508.023  -0.127   0.8992  
-Sample.unitplot/footprint              18151.072  19384.052   0.936   0.3497  
-MAT.C                                   9357.473   4302.184   2.175   0.0302 *
-MAP.mm                                   170.706    116.763   1.462   0.1446  
-Pulse.amount.mm                         -176.792    312.725  -0.565   0.5722  
-MAT.C:MAP.mm                             -17.913      9.546  -1.876   0.0614 .
-varGroupWater-related:MAP.mm              61.011    128.687   0.474   0.6357  
-varGroupWater-related:Pulse.amount.mm   -283.737    827.599  -0.343   0.7319  
+                                        Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                           -0.8664858  0.6271869  -1.382 0.168371    
+varGroupWater-related                 -0.4765567  0.7011566  -0.680 0.497354    
+Sample.unitindividual                  0.5263306  0.3137697   1.677 0.094731 .  
+Sample.unitplot/footprint             -0.0766225  0.2380945  -0.322 0.747867    
+MAT.C                                  0.0962360  0.0490096   1.964 0.050706 .  
+MAP.mm                                 0.0029990  0.0012137   2.471 0.014154 *  
+Pulse.amount.mm                        0.0004907  0.0047309   0.104 0.917481    
+MAT.C:MAP.mm                          -0.0002402  0.0001078  -2.229 0.026720 *  
+varGroupWater-related:MAP.mm          -0.0012680  0.0014345  -0.884 0.377626    
+varGroupWater-related:Pulse.amount.mm  0.0368064  0.0098662   3.731 0.000237 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 
-(Dispersion parameter for gaussian family taken to be 22995255011)
+(Dispersion parameter for gaussian family taken to be 2.204621)
 
-    Null deviance: 8.8919e+12  on 388  degrees of freedom
-Residual deviance: 8.7152e+12  on 379  degrees of freedom
-AIC: 10397
+    Null deviance: 616.95  on 254  degrees of freedom
+Residual deviance: 540.13  on 245  degrees of freedom
+  (91 observations deleted due to missingness)
+AIC: 937.05
 
 Number of Fisher Scoring iterations: 2
 

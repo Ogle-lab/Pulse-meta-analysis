@@ -188,8 +188,8 @@ clean_vars <- function(dfin, varname){
   df2 <- df1 %>%
     left_join(df1_pulse, by = c("Study.ID", "Pulse.ID", "Source.file.name")) %>%
     mutate(LRR = ifelse(controlMean==0, log(Mean), log(Mean/controlMean)),
-           poolVar = case_when(SD.type == "SD" ~ ((SD^2 + controlSD^2)/(2*N)*(1/Mean^2 + 1/controlMean^2)),
-                               SD.type == "SE" ~ ((SD^2 + controlSD^2)/2*(1/Mean^2 + 1/controlMean^2))))
+           poolVar = case_when(SD.type == "SD" ~ ((SD^2 + controlSD^2)/(2*N))*(1/Mean^2 + 1/controlMean^2),
+                               SD.type == "SE" ~ ((SD^2 + controlSD^2)/2)*(1/Mean^2 + 1/controlMean^2)))
 
   
   # Sanity check

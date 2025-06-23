@@ -40,11 +40,13 @@
       - This script is the JAGS code for the linear model.
 - 03-Mixture-simple
     - 01-run-model.R
-      - This script runs Mixture_model.R or Mixture_model_fixed_w.R depending on the specified argument.
+      - This script runs Mixture_model.R, Mixture_model_fixed_w.R, or Mixture_model_multivariate_fixed_w depending on the specified arguments.
     - Mixture_model.R
-      - This script is the JAGS code for the mixture model.
+      - This script is the JAGS code for the simple mixture model with all stochastic weights.
     - Mixture_model_fixed_w.R
-      - This script is the JAGS code for the mixture model with fixed weights.
+      - This script is the JAGS code for the univariate mixture model with fixed weights.
+    - Mixture_model_multivariate_fixed_w.R
+      - This script is the JAGS code for the multivariate mixture model with fixed weights.
 
 
 6. figures
